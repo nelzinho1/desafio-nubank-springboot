@@ -40,4 +40,4 @@ build/
 ### Node.js ###
 node_modules/
 # Spring Boot
-src/main/resources/application.properties
+/src/main/resources/application.properties
