@@ -14,5 +14,5 @@ import java.util.List;
 public class ClientsRequestDto {
 
     private String name;
-    private List<ContactsRequestDto> contactsDto;
+    private List<ContactsRequestDto> contacts;
 }

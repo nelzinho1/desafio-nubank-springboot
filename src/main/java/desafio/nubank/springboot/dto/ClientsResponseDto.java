@@ -15,5 +15,5 @@ public class ClientsResponseDto {
 
     private Long id;
     private String name;
-    private List<ContactsResponseDto> contactsDto;
+    private List<ContactsResponseDto> contacts;
 }

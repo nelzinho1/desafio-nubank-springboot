@@ -18,23 +18,28 @@ public class ClientService {
     @Autowired
     private ClientsRepository clientsRepository;
 
-    public Clients salveClients(ClientsRequestDto dto) {
+    public ClientsResponseDto salveClients(ClientsRequestDto dto) {
         Clients clients = new Clients();
         clients.setName(dto.getName());
 
-        if (dto.getContactsDto() != null && !dto.getContactsDto().isEmpty()) {
-            // express lambda
-            List<Contacts> contacts = dto.getContactsDto().stream().map(c -> {
-                Contacts contact = new Contacts();
-                contact.setCel(c.getCel());
-                contact.setEmail(c.getEmail());
-                contact.setClients(clients);
-                return contact;
-            }).toList();
+        if (dto.getContacts() != null && !dto.getContacts().isEmpty()) {
+            // expression lambda
+            List<Contacts> contacts = dto.getContacts()
+                    .stream()
+                    .map(c -> {
+
+                        Contacts contact = new Contacts();
+                        contact.setCel(c.getCel());
+                        contact.setEmail(c.getEmail());
+                        contact.setClients(clients);
+                        return contact;
+                    }).toList();
+
             clients.setContacts(contacts);
         }
+        Clients saved = clientsRepository.save(clients);
 
-        return clientsRepository.save(clients);
+        return toDto(saved);
     }
 
     // listar todos os clientes com seus contatos.
@@ -46,12 +51,16 @@ public class ClientService {
 
         Clients clients = clientsRepository.findById(clientId)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
-        return clients.getContacts().stream().map(c -> {
+        return clients.getContacts()
+                .stream()
+                .map(c -> {
+
             ContactsResponseDto contactDto = new ContactsResponseDto();
             contactDto.setId(c.getId());
             contactDto.setCel(c.getCel());
             contactDto.setEmail(c.getEmail());
             return contactDto;
+
         }).collect(Collectors.toList());
     }
 
@@ -60,14 +69,20 @@ public class ClientService {
         dto.setId(clients.getId());
         dto.setName(clients.getName());
 
-        List<ContactsResponseDto> contacts = dto.getContactsDto().stream().map(c -> {
-            ContactsResponseDto contactDto = new ContactsResponseDto();
-            contactDto.setId(c.getId());
-            contactDto.setCel(c.getCel());
-            contactDto.setEmail(c.getEmail());
-            return contactDto;
-        }).toList();
-        dto.setContactsDto(contacts);
+        List<ContactsResponseDto> contacts = clients.getContacts()
+                .stream()
+                .map(c -> {
+
+                    ContactsResponseDto contactDto = new ContactsResponseDto();
+
+                    contactDto.setId(c.getId());
+                    contactDto.setCel(c.getCel());
+                    contactDto.setEmail(c.getEmail());
+                    contactDto.setClientsId(clients.getId());
+
+                    return contactDto;
+                }).toList();
+        dto.setContacts(contacts);
 
         return dto;
     }
